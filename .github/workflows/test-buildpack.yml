@@ -9,7 +9,7 @@ on:
 env:
   EVOAR_URI: demo1204.cr.cloud.ru
   IMAGE_NAME: heroku-nodejs
-  DEFAULT_BUILDER: heroku/builder:22
+  DEFAULT_BUILDER: paketobuildpacks/builder-jammy-full # heroku/builder:22
 jobs:
   build:
     runs-on: ubuntu-latest
