@@ -8,6 +8,7 @@ on:
       - '.github/workflows/test-buildpack.yml'
 env:
   EVOAR_URI: demo1204.cr.cloud.ru
+  IMAGE_NAME: heroku-nodejs
   DEFAULT_BUILDER: heroku/builder:22
 jobs:
   build:
@@ -24,7 +25,7 @@ jobs:
         shell: bash
         run: pack config default-builder ${{env.DEFAULT_BUILDER}} 
            
-      - name: Create runnable application image using Heroku Builder
+      - name: Create runnable application image using builder
         id: buildpack
         shell: bash
         run: |
@@ -32,11 +33,13 @@ jobs:
           pack config experimental true
           
           pack build \
-           ${{ env.EVOAR_URI }}/helloworld:build${{ github.sha }} \
+           ${{ env.EVOAR_URI }}/{{ env.IMAGE_NAME }}:build${{ github.sha }} \
             --path . \
             --builder ${{env.DEFAULT_BUILDER}} \
         
       - name: Building image and pushing to registry using Docker
+        shell: bash
         run: |
-            docker push ${{ env.EVOAR_URI }}/helloworld:build${{ github.sha }}
+            docker login ${{ env.EVOAR_URI }} -u ${{ secrets.EVOAR_KEYID }} -p ${{ secrets.EVOAR_KEYSECRET }} \
+            docker push ${{ env.EVOAR_URI }}/{{ env.IMAGE_NAME }}:build${{ github.sha }}
           
