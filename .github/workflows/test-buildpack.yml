@@ -33,7 +33,7 @@ jobs:
           pack config experimental true
           
           pack build \
-           ${{ env.EVOAR_URI }}/{{ env.IMAGE_NAME }}:build${{ github.sha }} \
+           ${{ env.EVOAR_URI }}/${{ env.IMAGE_NAME }}:build${{ github.sha }} \
             --path . \
             --builder ${{env.DEFAULT_BUILDER}} \
         
@@ -41,5 +41,5 @@ jobs:
         shell: bash
         run: |
             docker login ${{ env.EVOAR_URI }} -u ${{ secrets.EVOAR_KEYID }} -p ${{ secrets.EVOAR_KEYSECRET }} \
-            docker push ${{ env.EVOAR_URI }}/{{ env.IMAGE_NAME }}:build${{ github.sha }}
+            docker push ${{ env.EVOAR_URI }}/${{ env.IMAGE_NAME }}:build${{ github.sha }}
           
