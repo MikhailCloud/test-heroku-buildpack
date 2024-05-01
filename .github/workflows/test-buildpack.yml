@@ -36,10 +36,16 @@ jobs:
            ${{ env.EVOAR_URI }}/${{ env.IMAGE_NAME }}:build${{ github.sha }} \
             --path . \
             --builder ${{env.DEFAULT_BUILDER}} \
+
+      - name: Log in to Evolution Artifact Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.EVOAR_URI }}
+          username: ${{ secrets.EVOAR_KEYID }}
+          password: ${{ secrets.EVOAR_KEYSECRET }}
         
       - name: Building image and pushing to registry using Docker
         shell: bash
         run: |
-            docker login ${{ env.EVOAR_URI }} -u ${{ secrets.EVOAR_KEYID }} -p ${{ secrets.EVOAR_KEYSECRET }} \
             docker push ${{ env.EVOAR_URI }}/${{ env.IMAGE_NAME }}:build${{ github.sha }}
           
