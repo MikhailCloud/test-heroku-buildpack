@@ -1,0 +1,42 @@
+name: Build OCI-image using build pack
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - '!.github/workflows/**'
+      - '.github/workflows/test-buildpack.yml'
+env:
+  EVOAR_URI: demo1204.cr.cloud.ru
+  DEFAULT_BUILDER: heroku/builder:22
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+  
+      - name: Install pack CLI
+        shell: bash
+        run: (curl -sSL "https://github.com/buildpacks/pack/releases/download/v0.33.2/pack-v0.33.2-${{ runner.os }}.tgz" | sudo tar -C /usr/local/bin/ --no-same-owner -xzv pack)
+  
+      - name: Set default builder
+        shell: bash
+        run: pack config default-builder ${{env.DEFAULT_BUILDER}} 
+           
+      - name: Create runnable application image using Heroku Builder
+        id: buildpack
+        shell: bash
+        run: |
+          echo 'Attempting to enable experimental features for the pack CLI'
+          pack config experimental true
+          
+          pack build \
+           ${{ env.EVOAR_URI }}/helloworld:build${{ github.sha }} \
+            --path . \
+            --builder ${{env.DEFAULT_BUILDER}} \
+        
+      - name: Building image and pushing to registry using Docker
+        run: |
+            docker push ${{ env.EVOAR_URI }}/helloworld:build${{ github.sha }}
+          
